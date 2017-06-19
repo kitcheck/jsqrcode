@@ -110,7 +110,7 @@ qrcode.setWebcam = function(videoId)
                     if(!useDevice) {
                         devices.forEach(
                             function(device) {
-                                if (device.kind === 'videoinput') {
+                                if (device.kind === 'videoinput' && !useDevice) {
                                     options=[{'sourceId': device.deviceId}] ;
                                     useDevice = device
                                     console.log('using: ', device);
