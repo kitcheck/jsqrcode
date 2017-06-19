@@ -45,6 +45,15 @@ qrcode.vidSuccess = function (stream)
     //     qrcode.video.src = window.URL.createObjectURL(stream)
 
     qrcode.video.srcObject = stream;
+    qrcode.video.play().then(
+        function(){
+            console.log('playing!');
+        }
+    ).catch(
+        function(e){
+            console.log('play error: ' + JSON.stringify(e));
+        }
+    )
 
     qrcode.gUM=true;
 
