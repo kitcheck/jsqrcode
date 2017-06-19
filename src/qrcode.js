@@ -29,17 +29,22 @@ qrcode.callback = null;
 
 qrcode.vidSuccess = function (stream)
 {
+    console.log('stream: ' + JSON.stringify(stream));
+    console.log('webkit: ' + qrcode.webkit);
     qrcode.localstream = stream;
-    if(qrcode.webkit)
-        qrcode.video.src = window.webkitURL.createObjectURL(stream);
-    else
-    if(qrcode.moz)
-    {
-        qrcode.video.mozSrcObject = stream;
-        qrcode.video.play();
-    }
-    else
-        qrcode.video.src = window.URL.createObjectURL(stream)
+
+    // if(qrcode.webkit)
+    //     qrcode.video.src = window.webkitURL.createObjectURL(stream);
+    // else
+    // if(qrcode.moz)
+    // {
+    //     qrcode.video.mozSrcObject = stream;
+    //     qrcode.video.play();
+    // }
+    // else
+    //     qrcode.video.src = window.URL.createObjectURL(stream)
+
+    qrcode.video.srcObject = stream;
 
     qrcode.gUM=true;
 
@@ -90,18 +95,18 @@ qrcode.captureToCanvas = function()
 
 qrcode.setWebcam = function(videoId)
 {
-    var n=navigator;
-    qrcode.video=document.getElementById(videoId);
+    var n = navigator;
+    qrcode.video = document.getElementById(videoId);
 
     var options = false;
     if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) {
         try {
             navigator.mediaDevices.enumerateDevices().then(
                 function(devices) {
-                    console.log('devices: ', devices);
+                    console.log('devices: ' + JSON.stringify(devices));
                     devices.forEach(
                         function(device) {
-                            console.log("device: ", device);
+                            console.log("device: " + JSON.stringify(device));
                             if (device.kind === 'videoinput') {
                                 if(device.label.toLowerCase().search("back") > -1) {
                                     options=[{'sourceId': device.deviceId}] ;
@@ -134,7 +139,7 @@ qrcode.setWebcam = function(videoId)
                 }
             ).catch(
                 function(e){
-                    console.log('devices error: ', e);
+                    console.log('devices error: ' + JSON.stringify(e));
                 }
             )
         }
