@@ -29,31 +29,11 @@ qrcode.callback = null;
 
 qrcode.vidSuccess = function (stream)
 {
-    console.log('stream: ' + JSON.stringify(stream));
-    console.log('webkit: ' + qrcode.webkit);
+    console.log('stream: ', stream);
+    console.log('webkit: ', qrcode.webkit);
     qrcode.localstream = stream;
 
-    // if(qrcode.webkit)
-    //     qrcode.video.src = window.webkitURL.createObjectURL(stream);
-    // else
-    // if(qrcode.moz)
-    // {
-    //     qrcode.video.mozSrcObject = stream;
-    //     qrcode.video.play();
-    // }
-    // else
-    //     qrcode.video.src = window.URL.createObjectURL(stream)
-
     qrcode.video.srcObject = stream;
-    qrcode.video.play().then(
-        function(){
-            console.log('playing!');
-        }
-    ).catch(
-        function(e){
-            console.log('play error: ' + JSON.stringify(e));
-        }
-    )
 
     qrcode.gUM=true;
 
@@ -105,6 +85,7 @@ qrcode.captureToCanvas = function()
 qrcode.setWebcam = function(videoId)
 {
     var n = navigator;
+    var useDevice
     qrcode.video = document.getElementById(videoId);
 
     var options = false;
@@ -112,25 +93,27 @@ qrcode.setWebcam = function(videoId)
         try {
             navigator.mediaDevices.enumerateDevices().then(
                 function(devices) {
-                    console.log('devices: ' + JSON.stringify(devices));
+                    console.log('devices: ', devices);
                     devices.forEach(
                         function(device) {
-                            console.log("device: " + JSON.stringify(device));
+                            console.log('device: ', device);
                             if (device.kind === 'videoinput') {
-                                if(device.label.toLowerCase().search("back") > -1) {
+                                if(device.label.toLowerCase().indexOf("back") !== -1) {
                                     options=[{'sourceId': device.deviceId}] ;
-                                    console.log('using: ' + device.kind + ": " + device.label + " id = " + device.deviceId);
+                                    useDevice = device
+                                    console.log('using: ', device);
                                 }
                             }
                         }
                     );
 
-                    if(!options) {
+                    if(!useDevice) {
                         devices.forEach(
                             function(device) {
                                 if (device.kind === 'videoinput') {
                                     options=[{'sourceId': device.deviceId}] ;
-                                    console.log('using: ' + device.kind + ": " + device.label + " id = " + device.deviceId);
+                                    useDevice = device
+                                    console.log('using: ', device);
                                 }
                             }
                         );
