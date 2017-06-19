@@ -118,6 +118,21 @@ qrcode.setWebcam = function(videoId)
                     }
                   });
               }
+
+              if(n.getUserMedia)
+                  n.getUserMedia({video: options, audio: false}, qrcode.vidSuccess, qrcode.vidError);
+              else
+              if(n.webkitGetUserMedia)
+              {
+                  qrcode.webkit=true;
+                  n.webkitGetUserMedia({video:options, audio: false}, qrcode.vidSuccess, qrcode.vidError);
+              }
+              else
+              if(n.mozGetUserMedia)
+              {
+                  qrcode.moz=true;
+                  n.mozGetUserMedia({video: options, audio: false}, qrcode.vidSuccess, qrcode.vidError);
+              }
             })
 
         }
@@ -128,21 +143,6 @@ qrcode.setWebcam = function(videoId)
     }
     else{
         console.log("no navigator.mediaDevices.enumerateDevices" );
-    }
-
-    if(n.getUserMedia)
-        n.getUserMedia({video: options, audio: false}, qrcode.vidSuccess, qrcode.vidError);
-    else
-    if(n.webkitGetUserMedia)
-    {
-        qrcode.webkit=true;
-        n.webkitGetUserMedia({video:options, audio: false}, qrcode.vidSuccess, qrcode.vidError);
-    }
-    else
-    if(n.mozGetUserMedia)
-    {
-        qrcode.moz=true;
-        n.mozGetUserMedia({video: options, audio: false}, qrcode.vidSuccess, qrcode.vidError);
     }
 }
 
