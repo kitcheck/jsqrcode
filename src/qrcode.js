@@ -33,6 +33,14 @@ qrcode.vidSuccess = function (stream)
     console.log('webkit: ', qrcode.webkit);
     qrcode.localstream = stream;
 
+    stream.oninactive = function(){
+        console.log('stream has gone inactive!');
+    }
+
+    var videoTracks = stream.getVideoTracks();
+
+    console.log('Using video tracks: ', videoTracks)
+
     qrcode.video.srcObject = stream;
 
     qrcode.gUM=true;
@@ -84,54 +92,74 @@ qrcode.captureToCanvas = function()
 
 qrcode.setWebcam = function(videoId)
 {
-    var n = navigator;
     var useDevice
     qrcode.video = document.getElementById(videoId);
+
+    function doGetUserMedia(device, success) {
+        var options = {
+            sourceId: device.deviceId
+        }
+
+        if (navigator.getUserMedia) {
+            navigator.getUserMedia({video: options, audio: false}, success, qrcode.vidError);
+        } else if(navigator.webkitGetUserMedia) {
+            qrcode.webkit=true;
+            navigator.webkitGetUserMedia({video:options, audio: false}, success, qrcode.vidError);
+        } else if(navigator.mozGetUserMedia) {
+            qrcode.moz=true;
+            navigator.mozGetUserMedia({video: options, audio: false}, success, qrcode.vidError);
+        }
+    }
 
     var options = false;
     if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) {
         try {
+            var afterDummyMedia = function(stream){
+                var videoTracks = stream.getVideoTracks();
+
+                navigator.mediaDevices.enumerateDevices().then(
+                    function(devices){
+                        console.log('populated devices: ', devices);
+                        var videoDevice;
+
+                        // Try to get 'back' camera first
+                        devices.forEach(function(device){
+                            if (device.kind === 'videoinput' && device.label.toLowerCase().indexOf('back') !== -1) {
+                                console.log('using BACK camera: ', device);
+                                videoDevice = device;
+                            }
+                        });
+
+                        // Otherwise just use the first video device
+                        devices.forEach(function(device){
+                            if (device.kind === 'videoinput' && !videoDevice) {
+                                console.log('using DEFAULT camera: ', device);
+                                videoDevice = device;
+                            }
+                        });
+
+                        doGetUserMedia(videoDevice, qrcode.vidSuccess);
+                    }
+                )
+            }
+
             navigator.mediaDevices.enumerateDevices().then(
-                function(devices) {
-                    console.log('devices: ', devices);
-                    devices.forEach(
-                        function(device) {
-                            console.log('device: ', device);
-                            if (device.kind === 'videoinput') {
-                                if(device.label.toLowerCase().indexOf("back") !== -1) {
-                                    options=[{'sourceId': device.deviceId}] ;
-                                    useDevice = device
-                                    console.log('using: ', device);
-                                }
-                            }
+                function(devices){
+                    console.log('initial devices: ', devices);
+                    var videoDevice;
+
+                    devices.forEach(function(device){
+                        if (device.kind === 'videoinput' && !videoDevice) {
+                            videoDevice = device;
                         }
-                    );
+                    });
 
-                    if(!useDevice) {
-                        devices.forEach(
-                            function(device) {
-                                if (device.kind === 'videoinput' && !useDevice) {
-                                    options=[{'sourceId': device.deviceId}] ;
-                                    useDevice = device
-                                    console.log('using: ', device);
-                                }
-                            }
-                        );
+                    if (!videoDevice) {
+                        return;
                     }
 
-                    if (n.getUserMedia) {
-                        n.getUserMedia({video: options, audio: false}, qrcode.vidSuccess, qrcode.vidError);
-                    } else if(n.webkitGetUserMedia) {
-                        qrcode.webkit=true;
-                        n.webkitGetUserMedia({video:options, audio: false}, qrcode.vidSuccess, qrcode.vidError);
-                    } else if(n.mozGetUserMedia) {
-                        qrcode.moz=true;
-                        n.mozGetUserMedia({video: options, audio: false}, qrcode.vidSuccess, qrcode.vidError);
-                    }
-                }
-            ).catch(
-                function(e){
-                    console.log('devices error: ' + JSON.stringify(e));
+                    // we have to do a dummy getUserMedia to populate the labels
+                    doGetUserMedia(videoDevice, afterDummyMedia);
                 }
             )
         }
