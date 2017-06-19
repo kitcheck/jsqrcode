@@ -39,7 +39,7 @@ qrcode.vidSuccess = function (stream)
         qrcode.video.play();
     }
     else
-        qrcode.video.src = stream;
+        qrcode.video.src = window.URL.createObjectURL(stream)
 
     qrcode.gUM=true;
 
