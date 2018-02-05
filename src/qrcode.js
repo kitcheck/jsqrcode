@@ -98,9 +98,17 @@ qrcode.setWebcam = function(videoId)
     function doGetUserMedia(device, success) {
         console.log('doGetUserMedia for: ', device)
 
-        var options = {
-            sourceId: device.deviceId
+        if (device) {
+            var options = {
+                sourceId: device.deviceId
+            }
+        } else {
+            var options = {
+                facingMode: 'environment'
+            }
         }
+
+        console.log('doGetUserMedia with options: ', options)
 
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
             console.log('Using navigator.mediaDevices')
@@ -171,7 +179,9 @@ qrcode.setWebcam = function(videoId)
                     console.log('Got video device: ', videoDevice)
 
                     // we have to do a dummy getUserMedia to populate the labels
-                    doGetUserMedia(videoDevice, afterDummyMedia);
+                    // doGetUserMedia(videoDevice, afterDummyMedia);
+
+                    doGetUserMedia(null, qrcode.vidSuccess);
                 }
             )
         }
