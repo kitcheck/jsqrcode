@@ -104,7 +104,7 @@ qrcode.setWebcam = function(videoId)
 
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
             console.log('Using navigator.mediaDevices')
-            navigator.mediaDevices.getUserMedia({video: options, audio: false}, success, qrcode.vidError);
+            navigator.mediaDevices.getUserMedia({video: options, audio: false}).then(success).catch(qrcode.vidError);
         } else if (navigator.getUserMedia) {
             console.log('Using navigator.getUserMedia')
             navigator.getUserMedia({video: options, audio: false}, success, qrcode.vidError);
