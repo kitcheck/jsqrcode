@@ -96,18 +96,24 @@ qrcode.setWebcam = function(videoId)
     qrcode.video = document.getElementById(videoId);
 
     function doGetUserMedia(device, success) {
+        console.log('doGetUserMedia for: ', device)
+
         var options = {
             sourceId: device.deviceId
         }
 
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-          navigator.mediaDevices.getUserMedia({video: options, audio: false}, success, qrcode.vidError);
+            console.log('Using navigator.mediaDevices')
+            navigator.mediaDevices.getUserMedia({video: options, audio: false}, success, qrcode.vidError);
         } else if (navigator.getUserMedia) {
+            console.log('Using navigator.getUserMedia')
             navigator.getUserMedia({video: options, audio: false}, success, qrcode.vidError);
         } else if(navigator.webkitGetUserMedia) {
+            console.log('Using webkit')
             qrcode.webkit=true;
             navigator.webkitGetUserMedia({video:options, audio: false}, success, qrcode.vidError);
         } else if(navigator.mozGetUserMedia) {
+            console.log('using moz')
             qrcode.moz=true;
             navigator.mozGetUserMedia({video: options, audio: false}, success, qrcode.vidError);
         }
@@ -117,6 +123,8 @@ qrcode.setWebcam = function(videoId)
     if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) {
         try {
             var afterDummyMedia = function(stream){
+                console.log('afterDummyMedia!')
+
                 var videoTracks = stream.getVideoTracks();
 
                 navigator.mediaDevices.enumerateDevices().then(
@@ -159,6 +167,8 @@ qrcode.setWebcam = function(videoId)
                     if (!videoDevice) {
                         return;
                     }
+
+                    console.log('Got video device: ', videoDevice)
 
                     // we have to do a dummy getUserMedia to populate the labels
                     doGetUserMedia(videoDevice, afterDummyMedia);
