@@ -100,7 +100,9 @@ qrcode.setWebcam = function(videoId)
             sourceId: device.deviceId
         }
 
-        if (navigator.getUserMedia) {
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          navigator.mediaDevices.getUserMedia({video: options, audio: false}, success, qrcode.vidError);
+        } else if (navigator.getUserMedia) {
             navigator.getUserMedia({video: options, audio: false}, success, qrcode.vidError);
         } else if(navigator.webkitGetUserMedia) {
             qrcode.webkit=true;
